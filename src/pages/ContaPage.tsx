@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Conta } from '../types';
 import { DADOS_CONTAS } from '../data/BD';
 
 const ContaPage: React.FC = () => {
-  const [todasAsContas, setTodasAsContas] = useState<Conta[]>(DADOS_CONTAS);
+  const [todasAsContas, setTodasAsContas] = useState<Conta[]>(() => {
+    const dadosSalvos = localStorage.getItem('dados_contas');
+    if (dadosSalvos) {
+      return JSON.parse(dadosSalvos);
+    }
+    return DADOS_CONTAS;
+  });
+
   const [valorNome, setValorNome] = useState('');
   const [valorSaldo, setValorSaldo] = useState(0);
   const [idEmEdicao, setIdEmEdicao] = useState<number | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('dados_contas', JSON.stringify(todasAsContas));
+  }, [todasAsContas]);
 
   const iniciarEdicao = (conta: Conta) => {
     setIdEmEdicao(conta.id);

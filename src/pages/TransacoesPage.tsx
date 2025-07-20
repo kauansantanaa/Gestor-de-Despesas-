@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Transacao, Conta, Categoria } from '../types';
-import { DADOS_CONTAS, DADOS_CATEGORIAS, DADOS_TRANSACOES } from '../data/BD';
+import { DADOS_TRANSACOES } from '../data/BD';
 
 const TransacoesPage: React.FC = () => {
-  const [listaDeTransacoes, setListaDeTransacoes] = useState<Transacao[]>(DADOS_TRANSACOES);
-  const [listaDeContas] = useState<Conta[]>(DADOS_CONTAS);
-  const [listaDeCategorias] = useState<Categoria[]>(DADOS_CATEGORIAS);
+  const [listaDeTransacoes, setListaDeTransacoes] = useState<Transacao[]>(() => {
+    const dadosSalvos = localStorage.getItem('dados_transacoes');
+    if (dadosSalvos) {
+      return JSON.parse(dadosSalvos);
+    }
+    return DADOS_TRANSACOES;
+  });
+  
+  const [listaDeContas] = useState<Conta[]>(() => {
+    const dadosSalvos = localStorage.getItem('dados_contas');
+    return dadosSalvos ? JSON.parse(dadosSalvos) : [];
+  });
+
+  const [listaDeCategorias] = useState<Categoria[]>(() => {
+    const dadosSalvos = localStorage.getItem('dados_categorias');
+    return dadosSalvos ? JSON.parse(dadosSalvos) : [];
+  });
 
   const [formDescricao, setFormDescricao] = useState('');
   const [formValor, setFormValor] = useState(0);
@@ -14,6 +28,10 @@ const TransacoesPage: React.FC = () => {
   const [formCategoriaId, setFormCategoriaId] = useState<number>(listaDeCategorias[0]?.id || 0);
 
   const [idEmEdicao, setIdEmEdicao] = useState<number | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('dados_transacoes', JSON.stringify(listaDeTransacoes));
+  }, [listaDeTransacoes]);
 
   const obterNomeDaEntidade = (id: number, lista: {id: number, nome: string}[]) => {
     const item = lista.find(item => item.id === id);

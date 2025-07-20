@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Categoria } from '../types';
 import { DADOS_CATEGORIAS } from '../data/BD';
 
 const CategoriasPage: React.FC = () => {
-  const [todasAsCategorias, setTodasAsCategorias] = useState<Categoria[]>(DADOS_CATEGORIAS);
+  const [todasAsCategorias, setTodasAsCategorias] = useState<Categoria[]>(() => {
+    const dadosSalvos = localStorage.getItem('dados_categorias');
+    if (dadosSalvos) {
+      return JSON.parse(dadosSalvos);
+    }
+    return DADOS_CATEGORIAS;
+  });
+
   const [valorNome, setValorNome] = useState('');
   const [valorTipo, setValorTipo] = useState<'receita' | 'despesa'>('despesa');
   const [idEmEdicao, setIdEmEdicao] = useState<number | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('dados_categorias', JSON.stringify(todasAsCategorias));
+  }, [todasAsCategorias]);
 
   const iniciarEdicao = (categoria: Categoria) => {
     setIdEmEdicao(categoria.id);
